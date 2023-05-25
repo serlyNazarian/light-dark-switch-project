@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ConfigProvider,
   theme,
@@ -12,31 +12,20 @@ import {
 } from "antd";
 import "./App.css";
 import TextArea from "antd/es/input/TextArea";
+import { useThemeDetector } from "./useThemeDetector";
+import useTheme from "./useTheme";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme, saveTheme } = useTheme();
+
+  const [isDarkMode, setIsDarkMode] = useState(theme === "dark");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [theme, setTheme] = useState(null);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    console.log("savedTheme:", savedTheme);
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark");
-    }
-  }, []);
+  const { isDarkTheme } = useThemeDetector();
 
-  const { matches } = window.matchMedia("(prefers-color-scheme: dark)");
-  const theme = matches ? "dark" : "light";
-  console.log(matches ? ">>>>>dark" : ">>>>>>light");
-
-  // useEffect(() => {
-  //   localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-  // }, [isDarkMode]);
-
-  console.log("isDarkMode:", isDarkMode);
+  // console.log("isDarkTheme :>> ", isDarkTheme, isDarkMode);
 
   const onChange = () => {
     setIsDarkMode((previousValue) => !previousValue);
@@ -46,6 +35,12 @@ function App() {
     console.log(`selected ${value}`);
   };
 
+  useEffect(() => {
+    const newTheme = isDarkMode ? "dark" : "light";
+    console.log("newTheme = ", newTheme);
+    saveTheme(newTheme);
+  }, [isDarkMode]);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -54,11 +49,6 @@ function App() {
   };
   const handleCancel = () => {
     setIsModalOpen(false);
-  };
-
-  const saveTheme = () => {
-    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-    console.log("theme :>> ", theme);
   };
 
   const themeLight = {
@@ -115,7 +105,6 @@ function App() {
           value={theme}
         />
         <Space size="large" style={{ margin: 15 }}>
-          <Button onClick={saveTheme}>Save Theme</Button>
           <Button type="primary" onClick={showModal}>
             Open Modal
           </Button>
