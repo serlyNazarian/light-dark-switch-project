@@ -4,7 +4,6 @@ import {
   theme,
   Card,
   Input,
-  Switch,
   Button,
   Modal,
   Space,
@@ -12,34 +11,31 @@ import {
 } from "antd";
 import "./App.css";
 import TextArea from "antd/es/input/TextArea";
-import { useThemeDetector } from "./useThemeDetector";
+import useThemeDetector from "./useThemeDetector";
 import useTheme from "./useTheme";
+import themeDarkConfig from "./themeDarkConfig.json";
+import themeLightConfig from "./themeLightConfig.json";
+import { useSelector } from "react-redux";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 function App() {
   const { theme, saveTheme } = useTheme();
-
-  const [isDarkMode, setIsDarkMode] = useState(theme === "dark");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { isDarkTheme } = useThemeDetector();
+  const { systemTheme } = useThemeDetector();
 
-  // console.log("isDarkTheme :>> ", isDarkTheme, isDarkMode);
+  const isDarkMode = useSelector((state) => state.theme);
 
-  const onChange = () => {
-    setIsDarkMode((previousValue) => !previousValue);
-  };
-
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
+  const [selectedTheme, setselectedTheme] = useState(theme ? "dark" : "light");
 
   useEffect(() => {
-    const newTheme = isDarkMode ? "dark" : "light";
-    console.log("newTheme = ", newTheme);
-    saveTheme(newTheme);
-  }, [isDarkMode]);
+    let isDark =
+      selectedTheme === "dark" ||
+      (selectedTheme === "system" && systemTheme === "dark");
+    saveTheme(isDark);
+    console.log("systemTheme :>> ", systemTheme);
+  }, [systemTheme, selectedTheme]);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -51,15 +47,8 @@ function App() {
     setIsModalOpen(false);
   };
 
-  const themeLight = {
-    colorBgBase: "#bde0fe",
-    colorPrimary: "#ffc8dd",
-  };
-
-  const themeDark = {
-    colorBgBase: "#5A5A5A",
-    colorPrimary: "#FF4C29",
-  };
+  const themeDark = themeDarkConfig;
+  const themeLight = themeLightConfig;
 
   return (
     <ConfigProvider
@@ -69,18 +58,13 @@ function App() {
       }}
     >
       <Card style={{ height: "100vh" }}>
-        <Switch
-          style={{ margin: 10 }}
-          onChange={onChange}
-          checked={isDarkMode}
-        />
         <Select
-          defaultValue={theme}
           style={{
             width: 120,
             margin: 10,
           }}
-          onChange={handleChange}
+          onChange={setselectedTheme}
+          value={selectedTheme}
           options={[
             {
               value: "light",
@@ -91,7 +75,7 @@ function App() {
               label: "Dark",
             },
             {
-              value: "System default",
+              value: "system",
               label: "System Default",
             },
           ]}

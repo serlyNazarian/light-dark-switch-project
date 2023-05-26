@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { persistReducer } from "redux-persist";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 const initialState = {
   theme: "dark",
@@ -19,11 +20,11 @@ const reducer = (state = initialState, action) => {
 
 const persistConfig = {
   key: "root",
-  storage: "local",
+  storage,
 };
 
-const store = configureStore({
-  reducer: persistReducer(reducer, persistConfig),
+export const store = configureStore({
+  reducer: persistReducer(persistConfig, reducer),
 });
 
-export default store;
+export const persistor = persistStore(store);

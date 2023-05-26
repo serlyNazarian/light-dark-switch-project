@@ -15,8 +15,8 @@ const useThemeDetector = () => {
       darkThemeMq.removeEventListener("change", mqListener);
     };
   }, []);
-
-  return { isDarkTheme };
+  console.log("isDarkTheme :>> ", isDarkTheme);
+  return { systemTheme: isDarkTheme ? "dark" : "light" };
 };
 
-export { useThemeDetector };
+export default useThemeDetector;
